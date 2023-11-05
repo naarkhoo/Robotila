@@ -7,6 +7,15 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+streamlit = "^1.28.0"
+google-cloud-speech = "^2.22.0"
+pyaudio = "^0.2.13"
+streamlit-audiorecorder = "^0.0.4"
+langchain = "^0.0.330"
+openai = "^0.28.1"
+watchdog = "^3.0.0"
+google-cloud-texttospeech = "^2.14.2"
+pre-commit = "^3.5.0"
 
 
 [build-system]
