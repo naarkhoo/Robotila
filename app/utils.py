@@ -1,7 +1,8 @@
 """Utility functions for the app."""
 from io import BytesIO
 
-from google.cloud import texttospeech
+import pyaudio
+from google.cloud import speech, texttospeech
 
 
 def response_to_audio(
@@ -37,3 +38,38 @@ def prepare_tts() -> tuple:
         audio_encoding=texttospeech.AudioEncoding.MP3
     )
     return voice, audio_config
+
+
+def audio_to_text(
+    audio: bytes, client: speech.SpeechClient, config: speech.RecognitionConfig
+) -> list:
+    """Audio to text."""
+    if len(audio) == 0:
+        print("No audio data was recorded.")
+    else:
+        response = client.recognize(config=config, audio=audio)
+
+    for result in response.results:
+        print(f"Transcript: {result.alternatives[0].transcript}")
+
+    # return [result.alternatives[0].transcript for result in response.results]
+    return result.alternatives[0].transcript
+
+
+def get_microphone_input() -> bytes:
+    """Gets input from the microphone."""
+    p = pyaudio.PyAudio()
+    stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True)
+
+    frames = []
+    while True:
+        data = stream.read(1024)
+        frames.append(data)
+        if len(frames) >= 5:
+            break
+
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
+    return b"".join(frames)
