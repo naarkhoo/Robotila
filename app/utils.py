@@ -1,4 +1,5 @@
 """Utility functions for the app."""
+import base64
 from io import BytesIO
 
 import pyaudio
@@ -33,9 +34,16 @@ def prepare_tts() -> tuple:
         name="en-IN-Neural2-A",
     )
 
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="da-DK",
+        # ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+        name="da-DK-Wavenet-A",
+    )
+
     # Select the type of audio file you want returned
     audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        speaking_rate=0.75,  # Adjust this value as needed for desired speed
     )
     return voice, audio_config
 
@@ -73,3 +81,18 @@ def get_microphone_input() -> bytes:
     p.terminate()
 
     return b"".join(frames)
+
+
+# Function to create an audio player with autoplay enabled
+def create_autoplay_audio_player(
+    audio_file: BytesIO, file_type: str = "audio/mp3"
+) -> str:
+    """Create an audio player with autoplay enabled."""
+    base64_audio = base64.b64encode(audio_file.read()).decode("utf-8")
+    audio_html = f"""
+        <audio autoplay>
+            <source src="data:{file_type};base64,{base64_audio}" type="{file_type}">
+            Your browser does not support the audio element.
+        </audio>
+    """
+    return audio_html
