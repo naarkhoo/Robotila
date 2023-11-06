@@ -127,7 +127,7 @@ if audio_input is not None and len(audio_input) > 0:
     handle_conversation(audio_input)
 
 
-# View the message contents in session state
-view_messages = st.expander("View the message contents in session state")
-with view_messages:
-    view_messages.json(st.session_state.langchain_messages)
+# # View the message contents in session state
+# view_messages = st.expander("View the message contents in session state")
+# with view_messages:
+#     view_messages.json(st.session_state.langchain_messages)
