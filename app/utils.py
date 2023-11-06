@@ -28,13 +28,13 @@ def response_to_audio(
 
 def prepare_tts() -> tuple:
     """Load requirement for TTS."""
-    voice = texttospeech.VoiceSelectionParams(
+    voice_en = texttospeech.VoiceSelectionParams(
         language_code="en-IN",
         # ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
         name="en-IN-Neural2-A",
     )
 
-    voice = texttospeech.VoiceSelectionParams(
+    voice_da = texttospeech.VoiceSelectionParams(
         language_code="da-DK",
         # ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
         name="da-DK-Wavenet-A",
@@ -45,7 +45,7 @@ def prepare_tts() -> tuple:
         audio_encoding=texttospeech.AudioEncoding.MP3,
         speaking_rate=0.75,  # Adjust this value as needed for desired speed
     )
-    return voice, audio_config
+    return voice_en, voice_da, audio_config
 
 
 def audio_to_text(

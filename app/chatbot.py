@@ -6,10 +6,13 @@ import streamlit as st
 from audiorecorder import audiorecorder
 from google.cloud import speech, texttospeech
 from langchain.chains import LLMChain
-from langchain.llms import OpenAI
+
+# from langchain.llms import ChatOpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.prompts import PromptTemplate
+from langdetect import detect
 from pydub import AudioSegment
 from utils import (
     audio_to_text,
@@ -26,7 +29,7 @@ verbose = False
 
 # Instantiates a client
 client_tts = texttospeech.TextToSpeechClient()
-voice, audio_config = prepare_tts()
+voice_en, voice_da, audio_config = prepare_tts()
 
 client_stt = speech.SpeechClient()
 stt_config = speech.RecognitionConfig(
@@ -49,6 +52,13 @@ memory = ConversationBufferMemory(chat_memory=msgs)
 if len(msgs.messages) == 0:
     response = "Hello, Robotila is here; what do you have in mind today?"
     msgs.add_ai_message(response)
+
+    lang = detect(response)
+    if lang == "en":
+        voice = voice_en
+    else:
+        voice = voice_da
+
     audio_file = response_to_audio(response, voice, audio_config, client_tts)
 
     # Create the audio player HTML with autoplay
@@ -68,7 +78,9 @@ Human: {human_input}
 AI: """
 prompt = PromptTemplate(input_variables=["history", "human_input"], template=template)
 llm_chain = LLMChain(
-    llm=OpenAI(openai_api_key=openai_api_key), prompt=prompt, memory=memory
+    llm=ChatOpenAI(openai_api_key=openai_api_key, model_name="gpt-3.5-turbo"),
+    prompt=prompt,
+    memory=memory,
 )
 
 # Render current messages from StreamlitChatMessageHistory
@@ -105,6 +117,12 @@ def handle_conversation(audio: Optional[AudioSegment]) -> None:
 
         # Display the AI's response as text
         st.chat_message("ai").write(response)
+
+        lang = detect(response)
+        if lang == "en":
+            voice = voice_en
+        else:
+            voice = voice_da
 
         # Synthesize speech for the AI's response
         audio_file = response_to_audio(response, voice, audio_config, client_tts)
