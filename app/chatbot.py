@@ -50,7 +50,10 @@ openai_api_key = os.environ.get("OPENAI_API_KEY")
 msgs = StreamlitChatMessageHistory(key="langchain_messages")
 memory = ConversationBufferMemory(chat_memory=msgs)
 if len(msgs.messages) == 0:
-    response = "Hello, Robotila is here; what do you have in mind today?"
+    response = (
+        "Hej min ven. Robotila er her. Du kan tale med mig på dansk eller engelsk;"
+    )
+    # "Hello, Robotila is here; You can talk to me in Danish or English;"
     msgs.add_ai_message(response)
 
     lang = detect(response)
